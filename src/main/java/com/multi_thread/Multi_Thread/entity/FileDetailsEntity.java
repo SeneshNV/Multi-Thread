@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class FileDetails {
+public class FileDetailsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +32,5 @@ public class FileDetails {
 
     @Column(nullable = false)
     private String status;
-
 
 }
