@@ -4,6 +4,7 @@ import com.multi_thread.Multi_Thread.entity.FileDetailsEntity;
 import com.multi_thread.Multi_Thread.repository.FileDetailsRepository;
 import com.multi_thread.Multi_Thread.service.FileNameGenerator.FileNameGenerator;
 import com.multi_thread.Multi_Thread.service.fileChecksumService.FileChecksumService;
+import com.multi_thread.Multi_Thread.service.uploadRecord.GetUploadedFiles;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Date;
-
+import java.util.List;
 
 @Service
 @Slf4j
@@ -98,5 +99,12 @@ public class FileService {
             fileUploadStatus =  "Error in uploading file: " + e;
         }
         return fileUploadStatus;
+    }
+
+    public List<String> UploadRecordData() {
+        GetUploadedFiles getUploadedFiles = new GetUploadedFiles(fileDetailsRepository);
+        List<String> filePaths = getUploadedFiles.displayFilePaths();
+        System.out.println(filePaths);
+        return filePaths; // Returns the list of uploaded file paths
     }
 }
