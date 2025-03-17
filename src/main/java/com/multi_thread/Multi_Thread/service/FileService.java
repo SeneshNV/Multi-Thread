@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -99,17 +100,39 @@ public class FileService {
     }
 
     public List<String> UploadRecordData() {
-
         GetUploadedFiles getUploadedFiles = new GetUploadedFiles(fileDetailsRepository, fileRecordDetailsRepository);
 
+        // get file paths
         List<String> filePaths = getUploadedFiles.displayFilePaths();
-        System.out.println(filePaths);
+        System.out.println("File Paths: " + filePaths);
+
 
         if (filePaths.isEmpty()) {
             return List.of("No uploaded files found.");
         }
 
-        List<String> fileDataRecords = getUploadedFiles.readFile(filePaths.get(0));
-        return fileDataRecords;
+        List<String> allFileDataRecords = new ArrayList<>();
+
+
+        for (int i = 0; i < filePaths.size(); i++) {
+            String filePath = filePaths.get(i);
+
+            try {
+
+                List<String> fileDataRecords = getUploadedFiles.readFile(filePath);
+                allFileDataRecords.addAll(fileDataRecords);
+
+                System.out.println("Processed file " + (i + 1) + ": " + filePath);
+
+            } catch (Exception e) {
+
+                System.err.println("Error processing file " + (i + 1) + ": " + filePath);
+                e.printStackTrace();
+            }
+        }
+
+        // Return the combined list of all file data records
+        return allFileDataRecords;
     }
+
 }
