@@ -30,7 +30,7 @@ public class UploadToDatabase {
 
         lineNumber += 1L;
 
-        System.out.println("Content: " + content);
+//        System.out.println("Content: " + content);
         System.out.println("File ID: " + fileId);
         System.out.println("New Line Number: " + lineNumber);
 
@@ -47,7 +47,7 @@ public class UploadToDatabase {
 
         fileRecordDetailsRepository.save(newRecord);
 
-        System.out.println("New record saved successfully!");
+//        System.out.println("New record saved successfully!");
 
         updateFileStatus(fileId);
     }
@@ -60,6 +60,6 @@ public class UploadToDatabase {
         fileDetailsEntity.setStatus("Done");
         fileDetailsRepository.save(fileDetailsEntity);
 
-        System.out.println("File status updated to 'Done' for file ID: " + fileId);
+//        System.out.println("File status updated to 'Done' for file ID: " + fileId);
     }
 }

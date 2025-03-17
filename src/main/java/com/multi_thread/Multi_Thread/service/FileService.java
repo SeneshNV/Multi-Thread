@@ -15,6 +15,10 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Service
 @Slf4j
@@ -113,23 +117,45 @@ public class FileService {
 
         List<String> allFileDataRecords = new ArrayList<>();
 
+        // Create a thread pool with 3 threads
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
 
-        for (int i = 0; i < filePaths.size(); i++) {
-            String filePath = filePaths.get(i);
+        // List to hold Future objects for each task
+        List<Future<List<String>>> futures = new ArrayList<>();
 
+
+        for (String filePath : filePaths) {
+            Future<List<String>> future = executorService.submit(() -> {
+                try {
+                    // Read the file and get its data records
+                    List<String> fileDataRecords = getUploadedFiles.readFile(filePath);
+                    System.out.println("Processed file: " + filePath);
+                    return fileDataRecords;
+                } catch (Exception e) {
+                    // Handle any errors that occur while processing the file
+                    System.err.println("Error processing file: " + filePath);
+                    e.printStackTrace();
+                    return new ArrayList<String>();
+                }
+            });
+
+            futures.add(future);
+        }
+
+        // Wait for all tasks to complete and collect results
+        for (Future<List<String>> future : futures) {
             try {
-
-                List<String> fileDataRecords = getUploadedFiles.readFile(filePath);
-                allFileDataRecords.addAll(fileDataRecords);
-
-                System.out.println("Processed file " + (i + 1) + ": " + filePath);
-
-            } catch (Exception e) {
-
-                System.err.println("Error processing file " + (i + 1) + ": " + filePath);
+                // Get the result of each task and add it to the combined list
+                allFileDataRecords.addAll(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                // Handle exceptions from the Future object
+                System.err.println("Error retrieving results from thread: " + e.getMessage());
                 e.printStackTrace();
             }
         }
+
+        // Shutdown the thread pool
+        executorService.shutdown();
 
         // Return the combined list of all file data records
         return allFileDataRecords;

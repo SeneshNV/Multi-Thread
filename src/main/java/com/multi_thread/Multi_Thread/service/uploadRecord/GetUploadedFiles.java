@@ -71,15 +71,15 @@ public class GetUploadedFiles {
 
                     try {
                         Integer.parseInt(line_no_s);
-                        System.out.println("int");
-                        System.out.println("Line No. : " + line_no_s);
+//                        System.out.println("int");
+//                        System.out.println("Line No. : " + line_no_s);
 
                         String Updateline = line.substring(number_length +1).trim();
 
                         sentences.append(Updateline).append(" ");
 
                     } catch (NumberFormatException e) {
-                        System.out.println("not int");
+//                        System.out.println("not int");
 
                         sentences.append(line).append(" ");
                     }
@@ -90,7 +90,7 @@ public class GetUploadedFiles {
 
                         uploadToDatabase.addToRecordDatabase(sentences, fileId);
 
-                        System.out.println(sentences);
+//                        System.out.println(sentences);
                         sentences.setLength(0);
                     }
                 }
