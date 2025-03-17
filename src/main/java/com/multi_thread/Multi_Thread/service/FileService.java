@@ -5,7 +5,6 @@ import com.multi_thread.Multi_Thread.repository.FileDetailsRepository;
 import com.multi_thread.Multi_Thread.service.FileNameGenerator.FileNameGenerator;
 import com.multi_thread.Multi_Thread.service.fileChecksumService.FileChecksumService;
 import com.multi_thread.Multi_Thread.service.uploadRecord.GetUploadedFiles;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,7 +55,6 @@ public class FileService {
 
             String uniqueFileName = FileNameGenerator.generateFileName(newFileNumber, originalFilename);
 
-
             //new file path
             String uploadDir = System.getProperty("user.dir") + File.separator + "Uploads";
             File directory = new File(uploadDir);
@@ -66,15 +64,11 @@ public class FileService {
 
             String filePath = uploadDir + File.separator + uniqueFileName;
 
-            // Print file name to console
             System.out.println("Uploaded file name: " + uniqueFileName);
 
-
-            // Creating an object of FileOutputStream class
             FileOutputStream fout = new FileOutputStream(filePath);
             fout.write(file.getBytes());
 
-            // Closing the connection
             fout.close();
 
             System.out.println("File Uploaded Successfully" + "\n | Checksum: " + checksumHexString);
@@ -102,9 +96,17 @@ public class FileService {
     }
 
     public List<String> UploadRecordData() {
+
         GetUploadedFiles getUploadedFiles = new GetUploadedFiles(fileDetailsRepository);
+
         List<String> filePaths = getUploadedFiles.displayFilePaths();
         System.out.println(filePaths);
-        return filePaths; // Returns the list of uploaded file paths
+
+        if (filePaths.isEmpty()) {
+            return List.of("No uploaded files found.");
+        }
+
+        List<String> fileDataRecords = getUploadedFiles.readFile(filePaths.get(6));
+        return fileDataRecords;
     }
 }

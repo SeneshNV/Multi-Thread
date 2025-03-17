@@ -4,6 +4,11 @@ import com.multi_thread.Multi_Thread.entity.FileDetailsEntity;
 import com.multi_thread.Multi_Thread.repository.FileDetailsRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +29,6 @@ public class GetUploadedFiles {
             return List.of(); // Return an empty list if no files are found
         }
 
-        // Collect file paths into a List<String>
         List<String> filePaths = uploadedFiles.stream()
                 .map(FileDetailsEntity::getFilePath)
                 .collect(Collectors.toList());
@@ -32,4 +36,61 @@ public class GetUploadedFiles {
         System.out.println("Uploaded Files: " + filePaths);
         return filePaths;
     }
+
+    //read the file line by line
+    public List<String> readFile(String filePath) {
+        List<String> lines = new ArrayList<>();
+
+        try {
+            FileReader reader = new FileReader(filePath);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+            String line;
+            StringBuilder sentences = new StringBuilder();
+
+            while ((line = bufferedReader.readLine()) != null) {
+                if (!line.isEmpty()) {
+
+                    String[] numbers = line.split("\\.");
+                    String line_no_s = numbers[0];
+                    int number_length = line_no_s.length();
+
+                    try {
+                        Integer.parseInt(line_no_s);
+                        System.out.println("int");
+                        System.out.println("Line No. : " + line_no_s);
+
+                        String Updateline = line.substring(number_length +1);
+
+                        sentences.append(Updateline).append(" ");
+
+                    } catch (NumberFormatException e) {
+                        System.out.println("not int");
+
+                        sentences.append(line).append(" ");
+                    }
+
+                } else {
+
+                    if (sentences.length() > 0) {
+                        lines.add(sentences.toString().trim());
+                        System.out.println(sentences);
+                        sentences.setLength(0);
+                    }
+                }
+            }
+
+            if (sentences.length() > 0) {
+                lines.add(sentences.toString().trim());
+                System.out.println(sentences);
+            }
+
+            reader.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading file: " + e.getMessage(), e);
+        }
+        return lines;
+    }
+
 }
+
