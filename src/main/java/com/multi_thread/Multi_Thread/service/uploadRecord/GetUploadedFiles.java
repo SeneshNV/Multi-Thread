@@ -2,6 +2,7 @@ package com.multi_thread.Multi_Thread.service.uploadRecord;
 
 import com.multi_thread.Multi_Thread.entity.FileDetailsEntity;
 import com.multi_thread.Multi_Thread.repository.FileDetailsRepository;
+import com.multi_thread.Multi_Thread.repository.FileRecordDetailsRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -10,15 +11,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class GetUploadedFiles {
 
     private final FileDetailsRepository fileDetailsRepository;
+    private final FileRecordDetailsRepository fileRecordDetailsRepository;
 
-    public GetUploadedFiles(FileDetailsRepository fileDetailsRepository) {
+    public GetUploadedFiles(FileDetailsRepository fileDetailsRepository, FileRecordDetailsRepository fileRecordDetailsRepository) {
         this.fileDetailsRepository = fileDetailsRepository;
+        this.fileRecordDetailsRepository = fileRecordDetailsRepository;
     }
 
     public List<String> displayFilePaths() {
@@ -40,6 +44,16 @@ public class GetUploadedFiles {
     //read the file line by line
     public List<String> readFile(String filePath) {
         List<String> lines = new ArrayList<>();
+        UploadToDatabase uploadToDatabase = new UploadToDatabase(fileRecordDetailsRepository, fileDetailsRepository);
+
+        Optional<FileDetailsEntity> fileDetailsEntityOptional = fileDetailsRepository.findByFilePath(filePath);
+
+
+            FileDetailsEntity fileDetailsEntity = fileDetailsEntityOptional.get();
+        Long fileId = fileDetailsEntity.getId();
+
+            System.out.println("File ID: " + fileId);
+
 
         try {
             FileReader reader = new FileReader(filePath);
@@ -60,7 +74,7 @@ public class GetUploadedFiles {
                         System.out.println("int");
                         System.out.println("Line No. : " + line_no_s);
 
-                        String Updateline = line.substring(number_length +1);
+                        String Updateline = line.substring(number_length +1).trim();
 
                         sentences.append(Updateline).append(" ");
 
@@ -71,9 +85,11 @@ public class GetUploadedFiles {
                     }
 
                 } else {
-
                     if (sentences.length() > 0) {
                         lines.add(sentences.toString().trim());
+
+                        uploadToDatabase.addToRecordDatabase(sentences, fileId);
+
                         System.out.println(sentences);
                         sentences.setLength(0);
                     }
@@ -82,6 +98,7 @@ public class GetUploadedFiles {
 
             if (sentences.length() > 0) {
                 lines.add(sentences.toString().trim());
+                uploadToDatabase.addToRecordDatabase(sentences, fileId);
                 System.out.println(sentences);
             }
 
@@ -93,4 +110,6 @@ public class GetUploadedFiles {
     }
 
 }
+
+
 

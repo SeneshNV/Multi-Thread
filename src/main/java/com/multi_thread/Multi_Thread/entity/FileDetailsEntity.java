@@ -32,5 +32,4 @@ public class FileDetailsEntity {
 
     @Column(nullable = false)
     private String status;
-
 }

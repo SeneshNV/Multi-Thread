@@ -2,6 +2,7 @@ package com.multi_thread.Multi_Thread.service;
 
 import com.multi_thread.Multi_Thread.entity.FileDetailsEntity;
 import com.multi_thread.Multi_Thread.repository.FileDetailsRepository;
+import com.multi_thread.Multi_Thread.repository.FileRecordDetailsRepository;
 import com.multi_thread.Multi_Thread.service.FileNameGenerator.FileNameGenerator;
 import com.multi_thread.Multi_Thread.service.fileChecksumService.FileChecksumService;
 import com.multi_thread.Multi_Thread.service.uploadRecord.GetUploadedFiles;
@@ -19,11 +20,13 @@ import java.util.List;
 public class FileService {
 
     private final FileDetailsRepository fileDetailsRepository;
+    private final FileRecordDetailsRepository fileRecordDetailsRepository;
 
     String fileUploadStatus;
 
-    public FileService(FileDetailsRepository fileDetailsRepository) {
+    public FileService(FileDetailsRepository fileDetailsRepository, FileRecordDetailsRepository fileRecordDetailsRepository) {
         this.fileDetailsRepository = fileDetailsRepository;
+        this.fileRecordDetailsRepository = fileRecordDetailsRepository;
     }
 
     public String uploadFile(MultipartFile file) {
@@ -75,7 +78,7 @@ public class FileService {
 
             // 3. insert data to database
             FileDetailsEntity fileDetailsEntity = new FileDetailsEntity();
-            fileDetailsEntity.setFileCode(originalFilename);
+            fileDetailsEntity.setFileCode(uniqueFileName);
             fileDetailsEntity.setFilePath(filePath);
             fileDetailsEntity.setUploadAt(new Date());
             fileDetailsEntity.setChecksum(checksumHexString);
@@ -97,7 +100,7 @@ public class FileService {
 
     public List<String> UploadRecordData() {
 
-        GetUploadedFiles getUploadedFiles = new GetUploadedFiles(fileDetailsRepository);
+        GetUploadedFiles getUploadedFiles = new GetUploadedFiles(fileDetailsRepository, fileRecordDetailsRepository);
 
         List<String> filePaths = getUploadedFiles.displayFilePaths();
         System.out.println(filePaths);
@@ -106,7 +109,7 @@ public class FileService {
             return List.of("No uploaded files found.");
         }
 
-        List<String> fileDataRecords = getUploadedFiles.readFile(filePaths.get(6));
+        List<String> fileDataRecords = getUploadedFiles.readFile(filePaths.get(0));
         return fileDataRecords;
     }
 }

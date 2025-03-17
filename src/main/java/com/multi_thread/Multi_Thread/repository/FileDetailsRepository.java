@@ -16,4 +16,6 @@ public interface FileDetailsRepository extends JpaRepository<FileDetailsEntity, 
     @Query("SELECT f FROM FileDetailsEntity f WHERE f.status = 'uploaded'")
     List<FileDetailsEntity> findAllUpdatedFileDetailsEntity();
 
+    Optional<FileDetailsEntity> findByFilePath(String filePath);
+
 }
