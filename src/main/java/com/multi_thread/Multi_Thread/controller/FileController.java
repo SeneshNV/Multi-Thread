@@ -29,8 +29,8 @@ public class FileController {
         return fileService.uploadFile(file);
     }
 
-    @GetMapping("/record")
-    public List<String> recodeUpload(){
-        return fileService.UploadRecordData();
-    }
+//    @GetMapping("/record")
+//    public List<String> recodeUpload(){
+//        return fileService.UploadRecordData();
+//    }
 }

@@ -6,6 +6,7 @@ import com.multi_thread.Multi_Thread.repository.FileRecordDetailsRepository;
 import com.multi_thread.Multi_Thread.service.FileNameGenerator.FileNameGenerator;
 import com.multi_thread.Multi_Thread.service.fileChecksumService.FileChecksumService;
 import com.multi_thread.Multi_Thread.service.uploadRecord.GetUploadedFiles;
+import com.multi_thread.Multi_Thread.thread.ThreadPool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,8 @@ import java.util.concurrent.Future;
 @Service
 @Slf4j
 public class FileService {
+
+    ThreadPool threadPool = new ThreadPool(3, 10);
 
     private final FileDetailsRepository fileDetailsRepository;
     private final FileRecordDetailsRepository fileRecordDetailsRepository;
@@ -103,61 +106,35 @@ public class FileService {
         return fileUploadStatus;
     }
 
-    public List<String> UploadRecordData() {
+    public String UploadRecordData() {
+
         GetUploadedFiles getUploadedFiles = new GetUploadedFiles(fileDetailsRepository, fileRecordDetailsRepository);
 
-        // get file paths
         List<String> filePaths = getUploadedFiles.displayFilePaths();
-        System.out.println("File Paths: " + filePaths);
-
+        System.out.println(filePaths);
 
         if (filePaths.isEmpty()) {
-            return List.of("No uploaded files found.");
+            return "No uploaded files found.";
         }
-
-        List<String> allFileDataRecords = new ArrayList<>();
-
-        // Create a thread pool with 3 threads
-        ExecutorService executorService = Executors.newFixedThreadPool(3);
-
-        // List to hold Future objects for each task
-        List<Future<List<String>>> futures = new ArrayList<>();
-
 
         for (String filePath : filePaths) {
-            Future<List<String>> future = executorService.submit(() -> {
-                try {
-                    // Read the file and get its data records
+
+            try{
+                threadPool.execute( () -> {
                     List<String> fileDataRecords = getUploadedFiles.readFile(filePath);
                     System.out.println("Processed file: " + filePath);
-                    return fileDataRecords;
-                } catch (Exception e) {
-                    // Handle any errors that occur while processing the file
-                    System.err.println("Error processing file: " + filePath);
-                    e.printStackTrace();
-                    return new ArrayList<String>();
-                }
-            });
 
-            futures.add(future);
-        }
+                });
 
-        // Wait for all tasks to complete and collect results
-        for (Future<List<String>> future : futures) {
-            try {
-                // Get the result of each task and add it to the combined list
-                allFileDataRecords.addAll(future.get());
-            } catch (InterruptedException | ExecutionException e) {
-                // Handle exceptions from the Future object
-                System.err.println("Error retrieving results from thread: " + e.getMessage());
-                e.printStackTrace();
+            } catch (Exception e) {
+                System.err.println("Error processing file: " + filePath);
+                throw new RuntimeException(e);
             }
+
         }
+        threadPool.waitUntilAllTasksFinished();
+//        threadPool.stop();
 
-        // Shutdown the thread pool
-        executorService.shutdown();
-
-        // Return the combined list of all file data records
-        return allFileDataRecords;
+        return "Current recorded are insert to Record Data Table";
     }
 }

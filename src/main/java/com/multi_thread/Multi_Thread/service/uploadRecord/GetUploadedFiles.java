@@ -62,8 +62,10 @@ public class GetUploadedFiles {
             String line;
             StringBuilder sentences = new StringBuilder();
 
-            while ((line = bufferedReader.readLine()) != null) {
+            while ((line = bufferedReader.readLine().trim()) != null) {
                 if (!line.isEmpty()) {
+
+
 
                     String[] numbers = line.split("\\.");
                     String line_no_s = numbers[0];
@@ -90,7 +92,7 @@ public class GetUploadedFiles {
 
                         uploadToDatabase.addToRecordDatabase(sentences, fileId);
 
-//                        System.out.println(sentences);
+                        System.out.println(sentences);
                         sentences.setLength(0);
                     }
                 }
