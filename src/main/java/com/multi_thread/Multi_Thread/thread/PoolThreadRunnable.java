@@ -2,6 +2,7 @@ package com.multi_thread.Multi_Thread.thread;
 
 import java.util.concurrent.BlockingQueue;
 
+//PoolThread class which implements the threads that execute the tasks.
 public class PoolThreadRunnable implements Runnable {
 
     private Thread        thread    = null;
@@ -18,13 +19,13 @@ public class PoolThreadRunnable implements Runnable {
             try{
                 Runnable runnable = (Runnable) taskQueue.take();
                 runnable.run();
-            } catch(Exception e){
-                //log or otherwise report exception,
-                //but keep pool thread alive.
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
+    //thread pool stop
     public synchronized void doStop(){
         isStopped = true;
         //break pool thread out of dequeue() call.

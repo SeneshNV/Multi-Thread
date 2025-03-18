@@ -12,11 +12,11 @@ public class ThreadPool {
     private boolean isStopped = false;
 
     public ThreadPool(int noOfThreads, int maxNoOfTasks){
+
         taskQueue = new ArrayBlockingQueue(maxNoOfTasks);
 
         for(int i=0; i<noOfThreads; i++){
-            PoolThreadRunnable poolThreadRunnable =
-                    new PoolThreadRunnable(taskQueue);
+            PoolThreadRunnable poolThreadRunnable = new PoolThreadRunnable(taskQueue);
 
             runnables.add(poolThreadRunnable);
         }
