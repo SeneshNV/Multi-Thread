@@ -62,7 +62,7 @@ public class GetUploadedFiles {
             String line;
             StringBuilder sentences = new StringBuilder();
 
-            while ((line = bufferedReader.readLine().trim()) != null) {
+            while ((line = bufferedReader.readLine()) != null) {
                 if (!line.isEmpty()) {
 
 

@@ -15,7 +15,7 @@ public class FixCronScheduler {
         this.fileService = fileService;
     }
 
-    @Scheduled(cron ="*/20 * * * * ?")
+    @Scheduled(cron ="*/15 * * * * ?")
     public void task(){
         try {
             String s = fileService.UploadRecordData();
